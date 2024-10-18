@@ -13,7 +13,10 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $faker = fake();
+    return view('dashboard', [
+        'welcomeMessages' => $faker->paragraphs(5),
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
