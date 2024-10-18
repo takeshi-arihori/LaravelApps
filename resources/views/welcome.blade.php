@@ -44,31 +44,14 @@
         <div class="max-w-4xl mx-auto py-12 px-4">
             <!-- Chat feature bubbles -->
             <div class="flex flex-col space-y-4">
-                <div class="flex items-center">
-                    <div class="bg-gray-300 text-gray-800 rounded-full px-6 py-3">
-                        1. Chat with the latest AI technology.
+                @foreach($chatMessages as $i=>$chat)
+                @php $odd = $i % 2 == 0; @endphp
+                <div class="flex item-center {{ $odd ? 'justify-end' : '' }}">
+                    <div class="{{ $odd ? 'bg-gray-300' : 'bg-blue-500' }} text-gray-800 rounded-full px-6 py-3">
+                        {{$chat}}
                     </div>
                 </div>
-                <div class="flex items-center justify-end">
-                    <div class="bg-blue-500 text-white rounded-full px-6 py-3">
-                        2. Get help finishing your assignments.
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="bg-gray-300 text-gray-800 rounded-full px-6 py-3">
-                        3. Get creative ideas.
-                    </div>
-                </div>
-                <div class="flex items-center justify-end">
-                    <div class="bg-blue-500 text-white rounded-full px-6 py-3">
-                        4. Reliable 24/7 customer support.
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <div class="bg-gray-300 text-gray-800 rounded-full px-6 py-3">
-                        5. Instant responses with no waiting time.1
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </main>
