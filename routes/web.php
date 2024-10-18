@@ -4,7 +4,12 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // fakerオブジェクトを生成
+    $faker = fake();
+    // 4から10のランダムな文を生成する
+    $chatMessages = $faker->sentences($faker->numberBetween(4, 10));
+    // 'welcome'ビューを表示し、生成したチャットメッセージをビューに渡す
+    return view('welcome', ['chatMessages' => $chatMessages]);
 });
 
 Route::get('/dashboard', function () {
