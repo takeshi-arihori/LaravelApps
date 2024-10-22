@@ -11,13 +11,13 @@
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">    
                 <div>
-                    <a href="#" class="flex items-center hover:text-gray-300">
+                    <a href="/" class="flex items-center hover:text-gray-300">                                                  
                         <span class="font-bold">AISuperChat</span>
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="#" class="hover:text-gray-300">Home</a>
-                    <a href="#" class="hover:text-gray-300">About</a>
+                    <a href="/" class="hover:text-gray-300">Home</a>
+                    <a href="/about" class="hover:text-gray-300">About</a>
                     @if (Route::has('login'))
                         @auth
                             <a href="{{ url('/dashboard') }}" class="hover:text-gray-300">Dashboard</a>
