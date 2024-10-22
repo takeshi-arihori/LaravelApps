@@ -1,22 +1,36 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
         @csrf
 
-        <!-- Name -->
+        <!-- ユーザー名 -->
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <x-input-label for="username" :value="__('Username')" />
+            <x-text-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('username')" class="mt-2" />
         </div>
 
-        <!-- Email Address -->
+        <!-- メールアドレス -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- Password -->
+        <!-- 説明 -->
+        <div class="mt-4">
+            <x-input-label for="description" :value="__('Description')" />
+            <textarea id="description" class="block mt-1 w-full" name="description" rows="4" required placeholder="{{ __('Describe yourself here.') }}" maxlength="2000">{{ old('description') }}</textarea>
+            <x-input-error :messages="$errors->get('description')" class="mt-2" />
+        </div>
+
+        <!-- プロフィール画像 -->
+        <div class="mt-4">
+            <x-input-label for="profile_picture" :value="__('Profile Picture')" />
+            <input id="profile_picture" class="block mt-1 w-full" type="file" name="profile_picture" accept="image/*" required />
+            <x-input-error :messages="$errors->get('profile_picture')" class="mt-2" />
+        </div>
+
+        <!-- パスワード -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
 
@@ -28,7 +42,7 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <!-- Confirm Password -->
+        <!-- 確認用パスワード -->
         <div class="mt-4">
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
 

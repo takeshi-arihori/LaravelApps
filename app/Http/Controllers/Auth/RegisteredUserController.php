@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,22 +30,42 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // 入力データの検証
+        // ユーザーが入力したデータ（ユーザー名、メールアドレス、説明、プロフィール画像、パスワード）をチェックします。
+        // 正しい形式や値であるかを確認します。
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'description' => ['required', 'string', 'max:2000'],
+            'profile_picture'=> ['required', 'image', 'mimes:jpeg,png,jpg','max:10240','extensions:jpg,png'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+    
+        // プロフィール画像の保存
+        // ユーザーがアップロードした画像ファイルを取り出し、安全なファイル名に変換して保存します。
+        $file = $request->file('profile_picture');
+        // // ファイル名をmd5文字列に変換します。ファイル名、ユーザー名、および現在の日付文字列を使用します。
+        $md5Filename = md5($file->getClientOriginalName() . $request->username . Carbon::now()->toDateString()) . '.' . $file->getClientOriginalExtension();
+        $profilePicturePath = $request->file('profile_picture')->store(sprintf('/users/profiles/profile_pictures/%s',$md5Filename), 'public');
+    
+        // ユーザーの作成
+        // 検証済みのデータを使って、新しいユーザーをデータベースに登録します。パスワードは暗号化して保存します。
         $user = User::create([
-            'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
+            'description' => $request->description,
+            'profile_path' => $profilePicturePath,
             'password' => Hash::make($request->password),
         ]);
-
+    
+        // ユーザーのログイン
+        // 新しいユーザーを自動的にログインさせます。
         event(new Registered($user));
-
         Auth::login($user);
-
+    
+        // ダッシュボードへのリダイレクト
+        // 登録が完了した後、ユーザーをダッシュボードページに移動させます。
         return redirect(route('dashboard', absolute: false));
     }
 }

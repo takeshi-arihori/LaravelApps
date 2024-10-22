@@ -1,30 +1,30 @@
 <?php
-
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+// Illuminate\Contracts\Auth\MustVerifyEmailを使用する場合はコメントを解除してください
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * 一括代入可能な属性。
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'username',
+        'description',
+        'profile_path',
         'email',
         'password',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * シリアライズ時に隠すべき属性。
      *
      * @var array<int, string>
      */
@@ -34,7 +34,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * キャストすべき属性を取得します。
      *
      * @return array<string, string>
      */
