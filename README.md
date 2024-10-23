@@ -168,7 +168,7 @@ CREATE DATABASE <上記の`.env`設定したDatabase名> CHARACTER SET utf8mb4 C
 ### MySQLログイン情報
 
 - username: laravel
-- password: password@123
+- password: password123
 
 ### 開発時のコマンド
 - `php artisan serve`: Laravelの開発サーバを起動

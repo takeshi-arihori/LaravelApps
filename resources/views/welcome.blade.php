@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>AISuperChat</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="flex flex-col min-h-screen bg-gray-100 text-gray-900 font-sans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISuperChat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="flex flex-col min-h-screen bg-gray-100 text-gray-900 font-sans">
     <nav class="bg-gray-900 text-white">
         <div class="max-w-6xl mx-auto px-4">
-            <div class="flex justify-between items-center py-4">    
+            <div class="flex justify-between items-center py-4">
                 <div>
-                    <a href="/" class="flex items-center hover:text-gray-300">                                                  
+                    <a href="/" class="flex items-center hover:text-gray-300">
                         <span class="font-bold">AISuperChat</span>
                     </a>
                 </div>
@@ -44,13 +46,13 @@
         <div class="max-w-4xl mx-auto py-12 px-4">
             <!-- Chat feature bubbles -->
             <div class="flex flex-col space-y-4">
-                @foreach($chatMessages as $i=>$chat)
-                @php $odd = $i % 2 == 0; @endphp
-                <div class="flex item-center {{ $odd ? 'justify-end' : '' }}">
-                    <div class="{{ $odd ? 'bg-gray-300' : 'bg-blue-500' }} text-gray-800 rounded-full px-6 py-3">
-                        {{$chat}}
+                @foreach ($chatMessages as $i => $chat)
+                    @php $odd = $i % 2 == 0; @endphp
+                    <div class="flex item-center {{ $odd ? 'justify-end' : '' }}">
+                        <div class="{{ $odd ? 'bg-gray-300' : 'bg-blue-500' }} text-gray-800 rounded-full px-6 py-3">
+                            {{ $chat }}
+                        </div>
                     </div>
-                </div>
                 @endforeach
             </div>
         </div>
@@ -58,5 +60,6 @@
     <footer class="bg-gray-900 text-white text-center p-4">
         <p>© {!! date('Y') !!} AISuperChat Service. All rights reserved.</p>
     </footer>
-    </body>
+</body>
+
 </html>
