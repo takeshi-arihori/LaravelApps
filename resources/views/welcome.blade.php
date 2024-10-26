@@ -57,8 +57,15 @@
             </div>
         </div>
     </main>
-    <footer class="bg-gray-900 text-white text-center p-4">
-        <p>© {!! date('Y') !!} AISuperChat Service. All rights reserved.</p>
+    <footer class="bg-gray-900 text-white text-center py-6">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-lg font-semibold mb-4">Recently Registered Users</h2>
+            @foreach ($users as $user)
+                <div class="d-flex flex-wrap bg-gray-800 rounded-lg p-2 m-1">
+                    <span class="text-sm font-medium">{{ $user->username }}</span>
+                </div>
+            @endforeach
+        </div>
     </footer>
 </body>
 
