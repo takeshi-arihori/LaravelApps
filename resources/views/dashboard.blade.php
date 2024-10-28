@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div>Welcome, {{ Auth::user()->username }}</div>
-                    @foreach($welcomeMessages as $welcomeMessage)
+                    @foreach ($welcomeMessages as $welcomeMessage)
                         <div class="mb-4 mt-4">{{ $welcomeMessage }}</div>
                     @endforeach
                 </div>
