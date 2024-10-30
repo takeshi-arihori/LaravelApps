@@ -1,66 +1,135 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Fitness App
+
+## ER図
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://github.com/user-attachments/assets/c19b056a-64b8-40d9-b694-06a4aa7e55b9" width="600" height="600" alt="FitnessApplication ER Diagram">
 </p>
 
-## About Laravel
+## 要件定義
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+ユーザーが自分の体重やカロリー摂取を記録できるフィットネストラッカーアプリケーション。ユーザーが体重に関するフィットネス目標を達成できるようにサポートすることを目的としています。
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 食品管理機能
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 新しい食品項目の作成
+  - 名前、カロリー、マクロ栄養素情報の登録
+- 既存の食品項目の更新
+- 食品項目の検索機能
+- 食品記録の削除
 
-## Learning Laravel
+### 日誌管理機能
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- 日誌記録の取得（全件・日付指定）
+- 日誌内の食品項目の更新
+- 日誌内の食品項目の削除
+- 日々のカロリー摂取量の追跡
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### APIエンドポイント
+**ユーザー関連**  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+GET /users/profile : ログイン中のユーザーのプロフィール情報取得
+PUT /users/profile : ログイン中のユーザーのプロフィール詳細更新
+```
 
-## Laravel Sponsors
+**食品関連**  
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```
+GET /food/create : 新規食品項目作成フォーム表示
+POST /food/create : 新規食品項目の作成
+GET /food/update : 既存食品項目更新フォーム表示
+PUT /food/update : 既存食品項目の更新
+GET /food/search : 食品項目検索（ページ表示）
+POST /api/food/search : 食品項目検索（JSON応答）
+DELETE /food/{food} : 特定食品記録の削除
+```
 
-### Premium Partners
+**日誌関連**  
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```
+GET /diary : 日誌記録の取得
+PUT /diary/{diaryEntry}/food-item/update/{diaryFoodItem} : 日誌内食品項目の更新
+DELETE /diary/{diaryEntry}/food-item/delete/{diaryFoodItem} : 日誌内食品項目の削除
+```
 
-## Contributing
+### データベース要件
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+MySQLの使用
+文字コード：utf8mb4
+照合順序：utf8mb4_unicode_ci
 
-## Code of Conduct
+### モデル
+データベースモデル構成
+```
+User（ユーザー）
+WeightEntry（体重記録）
+DiaryEntry（日誌記録）
+DiaryFoodItem（日誌内の食品項目）
+Food（食品）
+FoodType（食品タイプ）
+FoodTag（食品タグ）
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 開発環境セットアップ(mac, zsh)
 
-## Security Vulnerabilities
+**Composerインストール**  
+```zsh
+brew install composer
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**LaravelインストーラーをComposerでグローバルインストール**  
+```zsh
+composer global require laravel/installer
+```
 
-## License
+**Composerのパスを`.zshrc`に書き込む**
+```zsh
+echo 'export PATH="$PATH:$HOME/.composer/vendor/bin"' >> ~/.zshrc
+source ~/.zshrc
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**`Composer`の`bin`ディレクトリのパスを確認**
+```zsh
+composer global config bin-dir --absolute
+```
+
+**プロジェクト作成**  
+
+```zsh
+laravel new fitness-app
+```
+
+**プロジェクト設定**  
+
+- Starter Kit: Laravel Breeze
+- Breeze Stack: Blade with Alpine
+- Dark Mode Support: No
+- Testing Framework: PHPUnit
+- Database: MySQL
+
+
+**データベース作成**  
+
+```sql
+CREATE DATABASE fitness_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+**環境設定（`.env`）**  
+
+```zsh
+APP_NAME=MyFitnessTracker
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=fitness_app
+DB_USERNAME=laravel
+DB_PASSWORD="password"
+```
+
+**マイグレーション実行**  
+
+```zsh
+php artisan migrate
+```
+
