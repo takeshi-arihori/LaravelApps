@@ -119,3 +119,36 @@ $randomFood = App\Models\Food::factory()->create();
 - テストが終わったら `php artisan migrate:fresh` でデータベースをリセットして全てのマイグレーションを再実行する。(初期のプロジェクトなど)
 - プロトタイピングフェーズを過ぎると、通常は migrate を使ってスキーマを前進させ、migrate:rollback を使ってスキーマを元に戻す。
 
+## シーディング
+
+シードクラスでは、`run()` メソッドを実装し、その中でモデルのテーブルにデータを投入するためのロジックを記述。  
+例えば、ファクトリを使って一定数のデータを生成したり、設定ファイルを基にしてマスアサインメントと `create()` メソッドを使って動的にデータを作成することができる。  
+
+`php artisan db:seed {Seeder}`: シードクラスの実行  
+
+### Configファイルの作成
+1. `config/models/seeding/food.php ` に初期の食品名を設定するためのコンフィグファイルを作成  
+
+2. 作成したコンフィグファイルが正しく設定されているかを `php artisan tinker` で確認  
+
+```zsh
+> $factoryCount = config('models.seeding.food.factory_count');
+= 100
+
+> sprintf("Factory count is %d", $factoryCount);
+= "Factory count is 100"
+
+>
+```
+
+**default_listに設定されている食品の名前を取得しリスト表示**  
+
+```zsh
+$foodItems = config('models.seeding.food.default_list');
+implode('; ', array_map(function($food) { return $food['name']; }, $foodItems));
+```
+
+3. FoodSeederシーダを作成
+
+`updateOrCreate()` 関数: 最初の引数に検索条件となるカラムを指定し、その条件に一致するレコードがあればそのレコードを更新し、一致しなければ新しいレコードを作成。  
+
