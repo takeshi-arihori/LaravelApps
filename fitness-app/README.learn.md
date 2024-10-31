@@ -13,7 +13,7 @@
 クラス名を自動的にデータベースのテーブル名にマッピングしてくれる。`php artisan make:model --migration`や`--all`オプションを使用してマイグレーションを作成すると、テーブル名は英語の文法ルールに従って、モデル名の複数形になる。　例: `Userモデル` => `usersテーブル`   
 
 
-## `php artisan make:model Food --all`実行後のtree
+### `php artisan make:model Food --all`実行後のtree
 
 ```zsh
 app
@@ -55,3 +55,67 @@ php artisan make:migration {migrationName}
 ```zsh
 php artisan make:migration {migrationName} --table={table名}
 ```
+
+## ファクトリ
+
+### マスアサインメント
+データベースのテーブルに対応するモデルに対して、一度に複数の属性(カラム)の値をまとめて設定する方法。  
+配列やリクエストデータなどのキーと値のペアを使って、モデルの属性を一括で設定することを指す。  
+
+スキーマに一致するキーと値のペアを持つ連想配列を渡すことで簡単にデータを挿入できる。  
+`$fillable`変数で制御。(マスアサインメントを使用しないカラムを指定する場合は`$guarded`変数を使用)  
+例えば全てのカラムをマスアサインメント可能にしたい場合は、`$guarded`をからの配列に設定する。  
+
+### DBテスト
+
+- 1. 作成するデータのモデルを編集
+
+```zsh
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Food extends Model
+{
+    use HasFactory;
+
+    protected $guarded = []; // すべてのカラムがマスアサインメント可能
+}
+```
+
+- 2. DBに反映されるかテスト
+
+```zsh
+$apple = App\Models\Food::create([
+    'name' => 'Apple',
+    'protein' => 0.3,
+    'carbs' => 14,
+    'grams' => 100,
+    'fat' => 0.2,
+]);
+```
+- 3. `php artisan tinker`でテスト
+
+#### 簡単なテスト
+
+```zsh
+$randomFood = App\Models\Food::factory()->make();
+```
+`make()`関数はオブジェクトのインスタンスを作成するだけでデータベースには保存しない。
+
+#### データベースに登録する
+
+```zsh
+$randomFood = App\Models\Food::factory()->create();
+```
+
+#### モデルコレクションを使用
+モデルオブジェクトのリストで、`each()`、`filter()`、`map()`、`reduce()`、`pluck()` などの機能を使ってリストを操作する。
+
+例: `$randomFoodCollection = App\Models\Food::factory()->count(4)->make();` => Foodモデルのファクトリーを使って、4つの食品データ(インスタンス)を作成(DBには保存されない)  
+`$randomFoodCollection->map(function(App\Models\Food $food){ return $food->name; });` => map()関数を使って各食品データから`name`プロパティを取り出し、それをリストとして返す。  
+
+- テストが終わったら `php artisan migrate:fresh` でデータベースをリセットして全てのマイグレーションを再実行する。(初期のプロジェクトなど)
+- プロトタイピングフェーズを過ぎると、通常は migrate を使ってスキーマを前進させ、migrate:rollback を使ってスキーマを元に戻す。
+

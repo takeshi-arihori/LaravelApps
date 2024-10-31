@@ -17,7 +17,11 @@ class FoodFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->unique()->word,
+            'protein' => fake()->randomFloat(1, 0, 50),
+            'carbs' => fake()->randomFloat(1, 0, 100),
+            'fat' => fake()->randomFloat(1, 0, 50),
+            'grams' => fake()->randomFloat(1, 0, 500),
         ];
     }
 }
