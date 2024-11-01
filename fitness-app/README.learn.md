@@ -131,6 +131,7 @@ $randomFood = App\Models\Food::factory()->create();
 ### Configファイルの作成
 1. `config/models/seeding/food.php` に初期の食品名を設定するためのコンフィグファイルを作成  
 
+
 2. 作成したコンフィグファイルが正しく設定されているかを `php artisan tinker` で確認  
 
 ```zsh
