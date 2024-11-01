@@ -125,9 +125,11 @@ $randomFood = App\Models\Food::factory()->create();
 例えば、ファクトリを使って一定数のデータを生成したり、設定ファイルを基にしてマスアサインメントと `create()` メソッドを使って動的にデータを作成することができる。  
 
 `php artisan db:seed {Seeder}`: シードクラスの実行  
+例: `php artisan db:seed --class=FoodSeeder`  
+
 
 ### Configファイルの作成
-1. `config/models/seeding/food.php ` に初期の食品名を設定するためのコンフィグファイルを作成  
+1. `config/models/seeding/food.php` に初期の食品名を設定するためのコンフィグファイルを作成  
 
 2. 作成したコンフィグファイルが正しく設定されているかを `php artisan tinker` で確認  
 
