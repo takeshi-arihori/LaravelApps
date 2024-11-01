@@ -39,17 +39,17 @@ class FoodSeeder extends Seeder
                     'grams' => $foodItem['grams'],
                 ]
             );
+        }
 
-            // コンフィグから、ファクトリを使用するかどうかの設定を取得
-            $useFactory = $seedConfig['factory'];
-            // コンフィグから、ファクトリで生成する項目の数を取得
-            $factoryCount = $seedConfig['factory_count'];
+        // コンフィグから、ファクトリを使用するかどうかの設定を取得
+        $useFactory = $seedConfig['factory'];
+        // コンフィグから、ファクトリで生成する項目の数を取得
+        $factoryCount = $seedConfig['factory_count'];
 
-            // ファクトリを使用する設定がtrueの場合
-            if ($useFactory) {
-                // Foodファクトリを使用して、指定した数のランダムな食品データを作成し、データベースに保存
-                Food::factory()->count($factoryCount)->create();
-            }
+        // ファクトリを使用する設定がtrueの場合
+        if ($useFactory) {
+            // Foodファクトリを使用して、指定した数のランダムな食品データを作成し、データベースに保存
+            Food::factory()->count($factoryCount)->create();
         }
     }
 }
