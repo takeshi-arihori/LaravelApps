@@ -17,7 +17,13 @@ class JobListingFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => fake()->unique()->sentence(3),
+            'company' => fake()->word,
+            'description' => fake()->text,
+            'location' => fake()->word,
+            'type' => fake()->word,
+            'salary' => fake()->numberBetween(10000, 1000000),
+            'application_deadline' => fake()->dateTime(),
         ];
     }
 }
