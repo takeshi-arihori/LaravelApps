@@ -155,3 +155,134 @@ implode('; ', array_map(function($food) { return $food['name']; }, $foodItems));
 
 `updateOrCreate()` 関数: 最初の引数に検索条件となるカラムを指定し、その条件に一致するレコードがあればそのレコードを更新し、一致しなければ新しいレコードを作成。  
 
+## データ
+
+### データの更新
+例: `id`が90のFoodオブジェクトを取得しデータを変更  
+1. `update()`を使用
+
+```zsh
+$food = App\Models\Food::find(90);
+$food->update([
+    'name' => 'Orange',
+    'grams' => 100,
+    'protein' => 1,
+    'carbs' => 12,
+    'fat' => 0.2
+]);
+```
+
+2. `save()`を使用
+```
+$food = App\Models\Food::find(80);
+$food->name = 'Shrimp';
+$food->grams = 100;
+$food->protein = 24;
+$food->carbs = 0;
+$food->fat = 0.3;
+$food->save();
+```
+
+#### Eloquent ORMのマジックメソッドについて
+`__get()` `__set()`というマジックメソッドを使用して、クラス定義内で明示的に指定せずにインスタンス変数を割り当てたり取得したりする。  
+例: `$food->name` => nameというデータベースのカラムを探し、その値を取得する。
+
+
+#### Modelクラスの拡張
+以下のような独自のメソッドを追加することも可能  
+
+```zsh
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Food extends Model
+{
+    use HasFactory;
+
+    protected $guarded = [];
+
+    // カロリー計算メソッドの追加
+    public function getTotalCalories(): float
+    {
+        return ($this->protein * 4) + ($this->carbs * 4) + ($this->fat * 9);
+    }
+}
+```
+
+Tinkerで実行  
+
+```zsh
+$orange = App\Models\Food::find(90);
+$orange->getTotalCalories();
+```
+
+
+### データの削除
+
+#### データベースから行全体を完全に削除  
+
+```zsh
+$food = App\Models\Food::find(70);
+$food->delete();
+```
+
+
+#### ソフトデリート
+行を削除する代わりに、deleted_atというカラムに削除された日時を記録。行が削除されたことを示すが、DBには残る。
+
+1. Modelsクラスに `use SoftDeletes;` を追記
+2. マイグレーションを作成 `php artisan make:migration update_food_table_soft_delete --table=food`
+3. マイグレーションファイルを編集
+
+```zsh
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * マイグレーションを実行します。
+     */
+    public function up(): void
+    {
+        Schema::table('food', function (Blueprint $table) {
+            $table->softDeletes();  // `deleted_at`カラムを追加
+        });
+    }
+
+    /**
+     * マイグレーションを元に戻します。
+     */
+    public function down(): void
+    {
+        Schema::table('food', function (Blueprint $table) {
+            $table->dropSoftDeletes();  // `deleted_at`カラムを削除
+        });
+    }
+};
+
+```
+
+4. `php artisan migrate` を実行し、deleted_atカラムをデータベースに追加
+
+**id が 60 の Food 項目をソフトデリート**  
+```zsh
+$food = App\Models\Food::find(60);
+$food->delete();
+```
+
+**ソフトデリートされた行を取得**  
+
+```zsh
+$food = App\Models\Food::withTrashed()->where('id', 60)->first();
+$food->trashed(); // trueが返される
+$food->restore(); // データを復元
+$food->trashed(); // falseが返される
+
+$food = App\Models\Food::find(60);
+```
+
+## クエリ
