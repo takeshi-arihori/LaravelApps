@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('job_listings', function (Blueprint $table) {
             $table->id();
+            $table->string('title')->unique();
+            $table->string('company');
+            $table->text('description');
+            $table->string('location');
+            $table->string('type');
+            $table->decimal('salary', 8, 0);
+            $table->datetime('application_deadline');
             $table->timestamps();
         });
     }
