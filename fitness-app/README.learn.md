@@ -306,3 +306,212 @@ $foodList = App\Models\Food::where('protein', '>', 20)->get();
 
 ## 一対多の関係
 
+### FoodモデルとFoodTypeモデルの関係
+
+```zsh
+php artisan make:model FoodType --all
+```
+主キーは`name`に設定、マイグレーションファイルは`primary()`関数を使って設定。  
+クラスに `$primaryKey` `$incrementing` `$keyType` 変数を更新  
+
+#### FoodType
+```zsh 
+# FoodTypeクラスに追加
+    use HasFactory;
+
+    // 主キーを`name`に設定
+    protected $primaryKey = 'name';
+    public $incrementing = false;  // 自動インクリメントを無効化
+    protected $keyType = 'string'; // キーのデータ型を`string`に設定
+    protected $guarded = [];  // 全カラムのマスアサインメントを許可
+```
+
+#### database/migrations/{DATE}_created_food_type_table.php
+```zsh
+# マイグレーションに追加
+    $table->string('name')->primary();  // `name`を主キーとして設定
+    $table->string('description');  // `description`カラムを追加
+```
+
+#### database/seeder/FoodTypeSeeder.php
+```zsh
+    $seedConfig = config('models.seeding.food-types');
+    $foodTypes = $seedConfig['default_list'];
+
+    foreach($foodTypes as $foodType) {
+        FoodType::updateOrCreate(
+            [
+                'name' => $foodType['name'],
+                'description' => $foodType['description'],
+            ],
+        );
+    }
+```
+
+#### config/models/seeding/food-types.php
+defaultのリストを作成
+
+#### FoodTypeテーブルにデータをシード
+```zsh
+php artisan migrate
+php artisan db:seed --class=FoodTypeSeeder
+```
+
+#### tinkerで確認
+```zsh
+$vegetableType = App\Models\FoodType::find('Vegetables');
+$foodTypes = App\Models\FoodType::all();
+```
+
+### Food に対して FoodType の関連付け
+Foodクラスでは、関係を返す関数を定義することで、Laravel に対して Food クラスが他のモデルに属していることを知らせることができる。  
+「一対多」の関係: `belongsTo({Model}::class)`  
+Food モデルのクラスには、外部キーのカラム名として {method_name}_{foreign_column_name} という形式の名前が必要  
+
+
+### 関連付け
+- Food クラス内のメソッド名: `foodType()`
+- FoodType の主キー: `name`  
+- food テーブル: `food_type_name` という外部キーのカラム
+
+#### 新しいマイグレーションを作成し、foodテーブルに `food_type_name` カラムを追加
+```zsh
+php artisan make:migration update_food_associate_food_type --table=food
+```
+
+#### マイグレーションファイルに追加
+```zsh
+    /**
+     * マイグレーションを実行します。
+     */
+    public function up(): void
+    {
+        Schema::table('food', function (Blueprint $table) {
+            // foodテーブルにfood_type_nameという名前の新しいカラムを追加します。
+            // このカラムは文字列型（string）で、nullを許可しています。
+            $table->string('food_type_name')->nullable();
+
+            // 先ほど追加したfood_type_nameカラムを外部キーとして設定します。
+            // 具体的には、このカラムはfood_typesテーブルのnameカラムを参照します。
+            // food_typesテーブルで関連する行が削除されたときに、自動的にfoodテーブルの対応する行も削除されます。
+            // たとえば、Fruitsという名前のFoodTypeが削除された場合、それに関連するすべての食品（例えばオレンジやバナナなど）も自動的に削除されます。
+            $table->foreign('food_type_name')->references('name')->on('food_types')->onDelete('cascade');
+        });
+    }
+
+    /**
+     * マイグレーションを元に戻します。
+     */
+    public function down(): void
+    {
+        Schema::table('food', function (Blueprint $table) {
+            $table->dropForeign(['food_type_name']);
+            $table->dropColumn('food_type_name');
+        });
+    }
+```
+
+#### Foodモデルに関係を定義
+FoodモデルがFoodTypeモデルに属していることを示すために、Foodモデル内で`foodType()`メソッドを定義  
+
+```zsh
+class Food extends Model
+{
+    use HasFactory;
+    use SoftDeletes;
+
+    protected $guarded = [];
+
+    // FoodTypeとの関係を定義
+    public function foodType(): BelongsTo{
+        // このメソッドは、FoodモデルがFoodTypeモデルに属していることを示します。
+        // 'food_type_name'は、Foodテーブル内でFoodTypeモデルの主キーを参照する外部キーです。
+        // 'name'は、FoodTypeモデルの主キーのカラム名です。
+        // 通常、主キーは'id'ですが、ここでは'name'を主キーとして使っています。
+        return $this->belongsTo(FoodType::class, 'food_type_name', 'name');
+    }
+
+    public function getTotalCalories(): float
+    {
+        return ($this->protein * 4) + ($this->carbs * 4) + ($this->fat * 9);
+    }
+}
+```
+
+#### マイグレーションの実行
+
+```zsh
+php artisan migrate
+```
+
+#### tinkerで関連付けのテスト
+
+データベースに実際に保存するためモデルインスタンス間の関係を設定した後、その変更をデータベースに保存する必要がある。  
+
+```zsh
+$orange = App\Models\Food::find(90); // idが90の食品を取得
+$fruitType = App\Models\FoodType::find("Fruits"); // "Fruits"という名前のFoodTypeを取得
+$orange->foodType()->associate($fruitType); // リレーションシップを設定
+$orange->save(); // データベースに保存
+```
+
+### FoodTypeモデルからそのタイプに関連づけられている全てのFood項目を取得
+
+`hasMany()`を使用  
+
+#### tinkerでテスト
+```zsh
+$fruitType = App\Models\FoodType::find("Fruits");
+$foods = $fruitType->food; // "Fruits"に属するすべてのFoodを取得
+```
+
+#### Modelに追加
+
+```zsh
+    // Foodとの関係を定義
+    public function food(): HasMany
+    {
+        // このFoodTypeモデルに関連する複数のFoodモデルを取得する関係を定義します。
+        // 'food_type_name'は、Foodモデル側の外部キーです。
+        // 'name'は、FoodTypeモデル側の主キーです。
+        return $this->hasMany(Food::class, 'food_type_name', 'name');
+    }
+```
+
+#### tinkerで操作
+```zsh
+$banana = App\Models\Food::where('name','Banana')->first(); // "Banana"という名前の食品を取得
+$fruitType = App\Models\FoodType::find("Fruits"); // "Fruits"という名前のFoodTypeを取得
+
+$banana->foodType()->associate($fruitType); // "Banana"に"Fruits"を関連付け
+$banana->save(); // 保存
+
+$fruitType->food; // "Fruits"に関連付けられたすべての食品を取得
+$caloriesList = $fruitType->food->reduce(fn(string $carry, App\Models\Food $food) => $carry . sprintf("%s: %d calories\n", $food->name, $food->getTotalCalories()), ''); // カロリーのリストを作成
+
+$fruitType->food()->orderBy('carbs', 'desc')->limit(10)->get(); // 炭水化物が多い順に並べ替えたトップ10の食品を取得
+```
+
+#### 関係の解除
+```zsh
+$orange = App\Models\Food::find(90); // idが90の食品を取得
+$orange->foodType()->disassociate(); // リレーションシップを解除
+$orange->save(); // 保存
+```
+
+- 関係の所有者: `hasOne` `hasMany`
+- 他のモデルに所有されている逆方向の関係: `belongsTo` `belongsToMany`
+
+#### 特定のFoodTypeに属する新しいFoodを簡単に作成できる
+
+```zsh
+$foodType = App\Models\FoodType::find("Baked Goods");
+$foodType->food()->updateOrCreate([
+    'name' => 'Chocolate Chip Cookie'
+], [
+    'grams' => 50,
+    'protein' => 2.5,
+    'carbs' => 30.6,
+    'fat' => 10.5
+]);
+```
