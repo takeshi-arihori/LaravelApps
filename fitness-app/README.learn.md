@@ -515,4 +515,3 @@ $foodType->food()->updateOrCreate([
     'fat' => 10.5
 ]);
 ```
-
