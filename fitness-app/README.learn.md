@@ -515,3 +515,6 @@ $foodType->food()->updateOrCreate([
     'fat' => 10.5
 ]);
 ```
+
+## 多対多の関係
+
