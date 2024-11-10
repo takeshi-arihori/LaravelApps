@@ -4,4 +4,7 @@
     <p class="mb-1"><strong>Carbs:</strong> {{ $food->carbs }}g</p>
     <p class="mb-1"><strong>Fat:</strong> {{ $food->fat }}g</p>
     <p class="mb-1"><strong>Type:</strong> {{ $food->food_type_name ?? 'N/A' }}</p>
+    <div class="mt-auto">
+        {{ $slot }}
+    </div>
 </div>
