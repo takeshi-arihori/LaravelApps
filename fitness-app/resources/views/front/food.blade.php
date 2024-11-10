@@ -7,8 +7,12 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         @foreach ($foodItems as $i => $foodItem)
             <x-cards.food-item-card :food="$foodItem" color="blue">
-                <p class="text-center">({{ $i }})</p>
+                <p class="text-center">({{ ($foodItems->currentPage() - 1) * $foodItems->perPage() + $i + 1 }})</p>
             </x-cards.food-item-card>
         @endforeach
+    </div>
+
+    <div class="mt-4">
+        {{ $foodItems->links() }}
     </div>
 </x-front-layout>
