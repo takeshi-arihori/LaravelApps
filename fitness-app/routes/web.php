@@ -14,7 +14,8 @@ Route::get('/dashboard', function () {
 
 Route::get("/food", function () {
     return view('front.food', [
-        'foodItems' => Food::query()->orderByDesc('created_at')->limit(10)->get()
+        // 'foodItems' => Food::query()->orderByDesc('created_at')->limit(10)->get()
+        'foodItems' => Food::query()->orderByDesc('created_at')->paginate(10)
     ]);
 });
 
