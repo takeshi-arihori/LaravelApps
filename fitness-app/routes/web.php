@@ -6,18 +6,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('front.home');
-});
+})->name('front.home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get("/food", function () {
-    return view('front.food', [
-        // 'foodItems' => Food::query()->orderByDesc('created_at')->limit(10)->get()
-        'foodItems' => Food::query()->orderByDesc('created_at')->paginate(10)
-    ]);
-});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -26,3 +20,14 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+Route::get("/food", function () {
+    return view('front.food', [
+        // 'foodItems' => Food::query()->orderByDesc('created_at')->limit(10)->get()
+        'foodItems' => Food::query()->orderByDesc('created_at')->paginate(10)
+    ]);
+})->name('front.food');
+
+Route::get('/calculator', function () {
+    return view('front.calculator');
+})->name('front.calculator');

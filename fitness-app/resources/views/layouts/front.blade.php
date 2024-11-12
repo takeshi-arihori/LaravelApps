@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ env('APP_NAME') }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite('resources/css/app.css')
+
+    @isset($earlyAssetLoad)
+        {!! $earlyAssetLoad !!}
+    @endisset
 </head>
 
 <body class="bg-gray-50 text-gray-800 h-screen flex flex-col">
@@ -20,6 +24,12 @@
 
     @isset($js)
         {{ $js }}
+    @endisset
+
+    @vite('resources/js/app.js');
+
+    @isset($lateAssetLoad)
+        {!! $lateAssetLoad !!}
     @endisset
 
 </body>
