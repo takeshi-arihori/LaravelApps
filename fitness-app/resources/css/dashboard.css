@@ -2,10 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-.bg-midnight-blue {
-    background-color: #2c3e50;
-}
 nav a.active {
     color: #3182ce;
     font-weight: bold;
+}
+
+.bg-primary {
+    background-color: #2980b9;
+}
+
+.text-primary {
+    color: #2980b9;
 }

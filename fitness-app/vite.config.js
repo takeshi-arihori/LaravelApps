@@ -7,6 +7,9 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/js/calculators/calories.ts',
+                'resources/css/calculators/calories.css',
+                'resources/css/dashboard.css',
             ],
             refresh: true,
         }),

@@ -6,11 +6,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('front.home');
-});
+})->name('front.home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get("/food", function () {
+    return view('front.food', [
+        'foodItems' => Food::query()->orderByDesc('created_at')->paginate(10)
+    ]);
+})->name('front.food');
+
+Route::get('/calculator', function () {
+    return view('front.calculator');
+})->name('front.calculator');
 
 Route::get("/food", function () {
     return view('front.food', [
@@ -26,3 +32,4 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+require __DIR__ . '/dashboard.php';
