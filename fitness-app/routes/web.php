@@ -18,6 +18,13 @@ Route::get('/calculator', function () {
     return view('front.calculator');
 })->name('front.calculator');
 
+Route::get("/food", function () {
+    return view('front.food', [
+        // 'foodItems' => Food::query()->orderByDesc('created_at')->limit(10)->get()
+        'foodItems' => Food::query()->orderByDesc('created_at')->paginate(10)
+    ]);
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
