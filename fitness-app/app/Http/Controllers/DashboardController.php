@@ -9,11 +9,24 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    public function home(Request $request): View
+    {
+        return view('dashboard.home');
+    }
+
     public function food(Request $request): View
     {
         return view('dashboard.food', [
             'foodTypes' => FoodType::all(),
             'food' => Food::query()->orderByDesc('created_at')->paginate(10)
         ]);
+    }
+
+    public static function middleware(): array
+    {
+        return [
+            'auth',
+            'verified'
+        ];
     }
 }

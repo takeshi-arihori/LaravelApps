@@ -3,10 +3,6 @@
 use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/dashboard', function () {
-    return view('dashboard.home');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'home'])->name('dashboard');
 
-Route::get('/dashboard/food', [DashboardController::class, 'food'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard.food');
+Route::get('/dashboard/food', [DashboardController::class, 'food'])->name('dashboard.food');
