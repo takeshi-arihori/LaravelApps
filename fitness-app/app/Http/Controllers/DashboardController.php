@@ -16,9 +16,36 @@ class DashboardController extends Controller
 
     public function food(Request $request): View
     {
+        $queryParams = $request->toArray();
+        $query = Food::query();
+
+        // 名前検索
+        if (!empty($queryParams['name'])) {
+            $query->where('name', 'like', '%' . $queryParams['name'] . '%');
+        }
+
+        // 食べ物の種類でフィルタリング
+        if (!empty($queryParams['food_type'])) {
+            $query->whereHas('foodType', function ($q) use ($queryParams) {
+                $q->where('name', $queryParams['food_type']);
+            });
+        }
+
+        // タグ検索
+        if (!empty($queryParams['tags'])) {
+            $tags = array_map('trim', explode(',', $queryParams['tags']));
+            foreach ($tags as $tag) {
+                $query->whereHas('tags', function ($q) use ($tag) {
+                    $q->where('name', $tag);
+                });
+            }
+        }
+
+        $foodItems = $query->orderByDesc('created_at')->paginate(10);
+
         return view('dashboard.food', [
             'foodTypes' => FoodType::all(),
-            'food' => Food::query()->orderByDesc('created_at')->paginate(10)
+            'food' => $foodItems,
         ]);
     }
 
