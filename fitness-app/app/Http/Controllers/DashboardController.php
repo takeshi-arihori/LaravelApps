@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Food;
 use App\Models\FoodType;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Contracts\View\View;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
     public function home(Request $request): View
     {
@@ -16,8 +17,25 @@ class DashboardController extends Controller
 
     public function food(Request $request): View
     {
-        $queryParams = $request->toArray();
+        $tagValidation = function ($attribute, $value, $fail) {
+            $tags = array_map('trim', explode(',', $value));
+            if (!is_array($tags) || count($tags) === 0 || in_array('', $tags, true)) {
+                $fail('The ' . $attribute . ' must be a comma-separated list of valid tags.');
+            }
+        };
+
+        // リクエストのバリデーション
+        $queryParams = $request->validate([
+            // nullは不可、文字列であり、最大255文字
+            'name' => 'nullable|string|max:255',
+            // 省略可能 + string 型であること、existsルールを使ってfood_typesテーブルのnameカラムに存在する値であることを確認
+            'food_type' => 'nullable|string|exists:food_types,name',
+            // 省略可能 + カンマ区切りのタグとして文字列を受け付ける
+            'tags' => [$tagValidation],
+        ]);
+
         $query = Food::query();
+
 
         // 名前検索
         if (!empty($queryParams['name'])) {
@@ -35,13 +53,13 @@ class DashboardController extends Controller
         if (!empty($queryParams['tags'])) {
             $tags = array_map('trim', explode(',', $queryParams['tags']));
             foreach ($tags as $tag) {
-                $query->whereHas('tags', function ($q) use ($tag) {
+                $query->whereHas('Foodtags', function ($q) use ($tag) {
                     $q->where('name', $tag);
                 });
             }
         }
 
-        $foodItems = $query->orderByDesc('created_at')->paginate(10);
+        $foodItems = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
 
         return view('dashboard.food', [
             'foodTypes' => FoodType::all(),

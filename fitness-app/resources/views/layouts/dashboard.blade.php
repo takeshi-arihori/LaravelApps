@@ -17,6 +17,10 @@
     @include('layouts.dashboard.nav')
 
     <main class="container mx-auto p-8 max-w-6xl h-auto grow">
+        <!-- エラーメッセージ -->
+        <div>
+            @include('layouts.dashboard.messages')
+        </div>
         {{ $slot }}
     </main>
 
