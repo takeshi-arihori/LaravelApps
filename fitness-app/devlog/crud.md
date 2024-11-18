@@ -80,3 +80,21 @@ public static function middleware(): array {
 
 ## バリデーション
 
+
+## POSTリクエスト
+
+
+## リソースコントローラ
+
+| HTTP メソッド | URI                                   | コントローラのアクション（メソッド） | ルート名     |
+|---------------|---------------------------------------|--------------------------------------|--------------|
+| GET           | /dashboard/entries/food              | index メソッド                      | food.index   |
+| GET           | /dashboard/entries/food/create       | create メソッド                     | food.create  |
+| POST          | /dashboard/entries/food              | store メソッド                      | food.store   |
+| GET           | /dashboard/entries/food/{food}/edit  | edit メソッド                       | food.edit    |
+| PUT/PATCH     | /dashboard/entries/food/{food}       | update メソッド                     | food.update  |
+| DELETE        | /dashboard/entries/food/{food}       | destroy メソッド                    | food.destroy |
+| GET           | /dashboard/entries/food/{food}       | show メソッド                       | food.show    |
+
+
+
