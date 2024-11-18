@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Http\Requests\Dashboard\FoodSearchRequest; // FormRequestクラスをインポート
 use App\Models\Food;
 use App\Models\FoodType;
 use App\View\Components\Dashboard\FoodCards; // 新しいFoodCardsコンポーネントをインポート
@@ -18,19 +20,10 @@ class DashboardController extends Controller implements HasMiddleware
         return view('dashboard.home');
     }
 
-    public function food(Request $request): View
+    public function food(FoodSearchRequest $request): View
     {
-        // リクエストのバリデーション
-        $queryParams = $request->validate([
-            // nullは不可、文字列であり、最大255文字
-            'name' => 'nullable|string|max:255',
-            // 省略可能 + string 型であること、existsルールを使ってfood_typesテーブルのnameカラムに存在する値であることを確認
-            'food_type' => 'nullable|string|exists:food_types,name',
-            // 省略可能 + カンマ区切りのタグとして文字列を受け付ける
-            'tags' => 'nullable|string',
-        ]);
 
-        $query = $this->foodSearchQuery($queryParams);
+        $query = $this->foodSearchQuery(($request->toArray()));
 
         return view('dashboard.food', [
             'foodTypes' => FoodType::all(),
@@ -38,23 +31,16 @@ class DashboardController extends Controller implements HasMiddleware
         ]);
     }
 
-    public function foodSearch(Request $request): JsonResponse
+    public function foodSearch(FoodSearchRequest $request): JsonResponse
     {
-        // リクエストデータを検証
-        $queryParams = $request->validate([
-            'name' => 'nullable|string|max:255',
-            'food_type' => 'nullable|string|exists:food_types,name',
-            'tags' => 'nullable|string',
-        ]);
-
-        // 検索クエリを実行
-        $query = $this->foodSearchQuery($queryParams);
+        $query = $this->foodSearchQuery($request->toArray());
 
         // ページネーションとGETリンクを使用してデータを取得
         $foodPaginator = $query->orderByDesc('created_at')->paginate(perPage: 10)->withPath(route('dashboard.food'));
 
         // FoodCardsコンポーネントをインスタンス化し、ビューを生成
         $foodCardsComponent = new FoodCards($foodPaginator);
+
         $content = $foodCardsComponent->render()->with($foodCardsComponent->data())->render();
 
         return response()->json([
