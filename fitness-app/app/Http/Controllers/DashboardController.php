@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Food;
 use App\Models\FoodType;
+use App\View\Components\Dashboard\FoodCards; // 新しいFoodCardsコンポーネントをインポート
+use Illuminate\Database\Eloquent\Builder; // クエリビルダーの型指定を行うためにインポート
+use Illuminate\Http\JsonResponse; // JSONレスポンスの型指定を行うためにインポート
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Contracts\View\View;
@@ -17,13 +20,6 @@ class DashboardController extends Controller implements HasMiddleware
 
     public function food(Request $request): View
     {
-        $tagValidation = function ($attribute, $value, $fail) {
-            $tags = array_map('trim', explode(',', $value));
-            if (!is_array($tags) || count($tags) === 0 || in_array('', $tags, true)) {
-                $fail('The ' . $attribute . ' must be a comma-separated list of valid tags.');
-            }
-        };
-
         // リクエストのバリデーション
         $queryParams = $request->validate([
             // nullは不可、文字列であり、最大255文字
@@ -31,40 +27,69 @@ class DashboardController extends Controller implements HasMiddleware
             // 省略可能 + string 型であること、existsルールを使ってfood_typesテーブルのnameカラムに存在する値であることを確認
             'food_type' => 'nullable|string|exists:food_types,name',
             // 省略可能 + カンマ区切りのタグとして文字列を受け付ける
-            'tags' => [$tagValidation],
+            'tags' => 'nullable|string',
         ]);
 
+        $query = $this->foodSearchQuery($queryParams);
+
+        return view('dashboard.food', [
+            'foodTypes' => FoodType::all(),
+            'food' => $query->orderByDesc('created_at')->paginate(10)->withQueryString(),
+        ]);
+    }
+
+    public function foodSearch(Request $request): JsonResponse
+    {
+        // リクエストデータを検証
+        $queryParams = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'food_type' => 'nullable|string|exists:food_types,name',
+            'tags' => 'nullable|string',
+        ]);
+
+        // 検索クエリを実行
+        $query = $this->foodSearchQuery($queryParams);
+
+        // ページネーションとGETリンクを使用してデータを取得
+        $foodPaginator = $query->orderByDesc('created_at')->paginate(perPage: 10)->withPath(route('dashboard.food'));
+
+        // FoodCardsコンポーネントをインスタンス化し、ビューを生成
+        $foodCardsComponent = new FoodCards($foodPaginator);
+        $content = $foodCardsComponent->render()->with($foodCardsComponent->data())->render();
+
+        return response()->json([
+            'food' => $foodPaginator->items(), // 食品データをJSONとして返す
+            'content' => $content, // ビューの内容もJSONとして返す
+        ]);
+    }
+
+    private function foodSearchQuery(array $data): Builder
+    {
         $query = Food::query();
 
-
-        // 名前検索
-        if (!empty($queryParams['name'])) {
-            $query->where('name', 'like', '%' . $queryParams['name'] . '%');
+        // 名前フィルタが指定されている場合
+        if (!empty($data['name'])) {
+            $query->where('name', 'like', '%' . $data['name'] . '%');
         }
 
-        // 食べ物の種類でフィルタリング
-        if (!empty($queryParams['food_type'])) {
-            $query->whereHas('foodType', function ($q) use ($queryParams) {
-                $q->where('name', $queryParams['food_type']);
+        // フードタイプが指定されている場合
+        if (!empty($data['food_type'])) {
+            $query->whereHas('foodType', function ($q) use ($data) {
+                $q->where('name', $data['food_type']);
             });
         }
 
-        // タグ検索
-        if (!empty($queryParams['tags'])) {
-            $tags = array_map('trim', explode(',', $queryParams['tags']));
+        // タグが指定されている場合
+        if (!empty($data['tags'])) {
+            $tags = array_map('trim', explode(',', $data['tags'])); // タグを配列に変換
             foreach ($tags as $tag) {
-                $query->whereHas('Foodtags', function ($q) use ($tag) {
+                $query->whereHas('foodTags', function ($q) use ($tag) {
                     $q->where('name', $tag);
                 });
             }
         }
 
-        $foodItems = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
-
-        return view('dashboard.food', [
-            'foodTypes' => FoodType::all(),
-            'food' => $foodItems,
-        ]);
+        return $query; // フィルタリングされたクエリを返す
     }
 
     public static function middleware(): array
