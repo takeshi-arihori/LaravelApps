@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Requests\Dashboard\FoodSearchRequest; // FormRequestクラスをインポート
 use App\Models\Food;
 use App\Models\FoodType;
