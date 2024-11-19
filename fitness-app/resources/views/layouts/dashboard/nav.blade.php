@@ -5,8 +5,9 @@
             <a href="{{ route('dashboard') }}" class="text-gray-600 hover:text-primary">Home</a>
             <a href="/" target="_blank" class="text-gray-600 hover:text-primary">Diary</a>
             <a href="/" target="_blank" class="text-gray-600 hover:text-primary">Stats</a>
-            <a href="/" target="_blank" class="text-gray-600 hover:text-primary">My Food</a>
-            <a href="/" target="_blank" class="text-gray-600 hover:text-primary">Food</a>
+            <!-- 'food.index' ルートへのリンク -->
+            <a href="{{ route('food.index') }}" class="text-gray-600 hover:text-primary">My Food</a>
+            <a href="{{ route('dashboard.food') }}" class="text-gray-600 hover:text-primary">Food</a>
             <a href="/" target="_blank" class="text-gray-600 hover:text-primary">Exercises</a>
         </div>
         <div class="flex items-center space-x-4">
